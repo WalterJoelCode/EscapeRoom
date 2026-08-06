@@ -1,0 +1,10 @@
+---
+import SectionHeader from './SectionHeader.astro';
+const labs = [['01','Topología de una LAN','Ordena router, switch y estaciones en una red funcional.','10 min'],['02','Calculadora de subredes','Practica máscaras /24, /26 y /28 con casos guiados.','15 min'],['03','Mesa de cableado','Relaciona conectores, estándares y medios de transmisión.','12 min']];
+const resources = [['GUÍA','Mapa rápido del modelo OSI','Resumen visual de capas, protocolos y dispositivos.'],['FICHA','Direcciones IPv4 esenciales','Rangos privados, máscaras y direcciones reservadas.'],['CHECKLIST','Diagnóstico en 7 pasos','Una secuencia práctica para localizar fallas de conectividad.']];
+---
+<section id="laboratorios" class="section"><div class="site-container"><SectionHeader eyebrow="Zona de práctica" title="Laboratorios para experimentar sin miedo" description="Actividades demostrativas para reforzar cada habilidad antes de entrar a una misión." />
+	<div class="mt-14 grid gap-5 md:grid-cols-3">{labs.map(lab => <article class="lab-card"><span class="lab-number">LAB {lab[0]}</span><div class="lab-visual" aria-hidden="true"><i></i><i></i><i></i></div><h3>{lab[1]}</h3><p>{lab[2]}</p><div class="mt-auto flex justify-between pt-5 text-xs font-bold"><span>{lab[3]}</span><span class="text-cyan">DEMOSTRACIÓN</span></div></article>)}</div>
+</div></section>
+<section id="recursos" class="section light-section"><div class="site-container grid gap-12 lg:grid-cols-[.8fr_1.2fr]"><SectionHeader eyebrow="Biblioteca de campo" title="Recursos listos para la próxima misión" description="Materiales de consulta breve pensados para acompañar el aprendizaje y volver al reto cuanto antes." align="left" />
+	<div class="grid gap-3">{resources.map(resource => <article class="resource-row"><span>{resource[0]}</span><div><h3>{resource[1]}</h3><p>{resource[2]}</p></div><b aria-hidden="true">↗</b></article>)}</div></div></section>

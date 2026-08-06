@@ -1,0 +1,13 @@
+---
+import SectionHeader from './SectionHeader.astro';
+const benefits = [
+	['01','Aprende haciendo','Convierte conceptos técnicos en decisiones dentro de escenarios cercanos al mundo real.'],
+	['02','Piensa como especialista','Diagnostica fallas, interpreta pistas y elige soluciones con criterio de redes.'],
+	['03','Avanza y celebra','Suma puntos, desbloquea insignias y comprueba cuánto dominas en cada misión.'],
+];
+---
+<section id="presentacion" class="section light-section">
+	<div class="site-container"><SectionHeader eyebrow="Tu centro de entrenamiento" title="Menos teoría aislada. Más decisiones que conectan." description="Una ruta gamificada que transforma los fundamentos de infraestructura en retos breves, claros y medibles." />
+	<div class="mt-14 grid gap-5 md:grid-cols-3">{benefits.map(item => <article class="feature-card"><span>{item[0]}</span><h3>{item[1]}</h3><p>{item[2]}</p></article>)}</div>
+	<div class="stats-strip"><div><strong>7</strong><span>misiones</span></div><div><strong>20+</strong><span>retos prácticos</span></div><div><strong>100%</strong><span>en tu navegador</span></div><div><strong>∞</strong><span>intentos</span></div></div></div>
+</section>
