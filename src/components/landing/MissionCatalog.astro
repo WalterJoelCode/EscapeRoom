@@ -1,0 +1,10 @@
+---
+import SectionHeader from './SectionHeader.astro';
+import { missions } from '../../data/missions';
+---
+<section id="misiones" class="section">
+	<div class="site-container"><SectionHeader eyebrow="Mapa de operaciones" title="Siete misiones. Una red por salvar." description="Cada reto desarrolla una habilidad concreta. Comienza con Detective IP y prepara el camino hacia la misión final." />
+	<div class="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3">{missions.map((mission) => <article class:list={['mission-card', mission.status === 'available' && 'mission-featured', mission.status === 'locked' && 'opacity-60']}>
+		<div class="flex items-start justify-between"><span class="mission-icon">{mission.icon}</span><span class="mission-code">MISIÓN {mission.code}</span></div><h3>{mission.title}</h3><p>{mission.description}</p><div class="mt-auto flex items-center justify-between pt-6"><span class="mission-meta">{mission.level} · {mission.duration}</span>{mission.status === 'available' ? <a href="#jugar" class="card-link">Jugar ahora →</a> : <span class="text-xs font-bold text-slate-500">{mission.status === 'locked' ? 'BLOQUEADA' : 'PRÓXIMAMENTE'}</span>}</div>
+	</article>)}</div></div>
+</section>

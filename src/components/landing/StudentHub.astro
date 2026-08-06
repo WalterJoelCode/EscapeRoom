@@ -1,0 +1,19 @@
+---
+import SectionHeader from './SectionHeader.astro';
+const leaders = [['01','Luna_Router','4,820'],['02','NetMaster','4,560'],['03','ByteNinja','4,210'],['04','Tú','0']];
+const badges = [['⌖','Detective IP','Completa la misión 02'],['⚡','Respuesta rápida','Responde en menos de 30 s'],['◎','Sin errores','Logra una misión perfecta'],['◆','Arquitecto de red','Supera la misión final']];
+---
+<section id="progreso" class="section light-section">
+	<div class="site-container"><SectionHeader eyebrow="Panel del agente" title="Tu progreso cuenta una historia" description="Cada respuesta correcta suma experiencia. Tus logros se conservan en este navegador, sin cuentas ni datos personales." />
+	<div class="mt-14 grid gap-6 lg:grid-cols-[1.25fr_.75fr]">
+		<article class="dashboard-card"><div class="flex flex-wrap items-center justify-between gap-4"><div><p class="eyebrow">Nivel actual</p><h3 class="mt-2 text-2xl">Agente en entrenamiento</h3></div><div class="level-orb"><strong id="dashboard-score">0</strong><span>XP</span></div></div><div class="mt-8"><div class="mb-2 flex justify-between text-xs"><span>Progreso total</span><span id="dashboard-percent">0%</span></div><div class="progress-track"><i id="dashboard-progress" style="width:0%"></i></div></div><div class="mt-8 grid gap-3 sm:grid-cols-2">{badges.map((badge, i) => <div class:list={['badge-item', i > 0 && 'is-locked']}><span>{badge[0]}</span><div><strong>{badge[1]}</strong><small>{badge[2]}</small></div></div>)}</div></article>
+		<article class="dashboard-card"><div class="flex items-center justify-between"><div><p class="eyebrow">Clasificación</p><h3 class="mt-2 text-2xl">Ranking semanal</h3></div><span class="text-2xl">🏆</span></div><ol class="mt-6 space-y-2">{leaders.map(row => <li class:list={['rank-row', row[1] === 'Tú' && 'you']}><span>{row[0]}</span><strong>{row[1]}</strong><b>{row[2]} XP</b></li>)}</ol></article>
+	</div></div>
+</section>
+<script>
+	const saved = JSON.parse(localStorage.getItem('mision-conectar-progress') || '{}');
+	const score = Number(saved.score || 0); const percent = Math.min(100, Number(saved.completed || 0) * 20);
+	document.querySelector('#dashboard-score')!.textContent = String(score);
+	document.querySelector('#dashboard-percent')!.textContent = `${percent}%`;
+	(document.querySelector('#dashboard-progress') as HTMLElement).style.width = `${percent}%`;
+</script>
