@@ -1,38 +1,72 @@
 ---
 import SectionHeader from '../landing/SectionHeader.astro';
-import { questions } from '../../data/missions';
+import { missions } from '../../data/missions';
 ---
 <section id="jugar" class="section mission-section">
-	<div class="site-container"><SectionHeader eyebrow="Misión funcional" title="Detective IP: localiza al intruso" description="Analiza cinco evidencias. Dispones de dos pistas y 12 minutos para cerrar el caso." />
-	<div class="game-shell mt-12" data-questions={JSON.stringify(questions)}>
-		<div class="game-topbar"><div><span class="live-dot"></span><strong>MISIÓN 02 · EN CURSO</strong></div><div class="game-counters"><span>PISTAS <b id="hints-count">2</b></span><span>XP <b id="game-score">0</b></span><span aria-label="Tiempo restante">◷ <b id="timer">12:00</b></span></div></div>
-		<div class="game-progress"><i id="game-progress-bar"></i></div>
-		<div id="game-start" class="game-stage text-center"><div class="mission-seal">⌖</div><h3>Expediente #192.168</h3><p>Un dispositivo desconocido apareció en la red del laboratorio. Interpreta las evidencias de direccionamiento y descubre dónde se esconde.</p><button id="start-game" class="button mt-8">Abrir expediente</button><button id="reset-game" class="text-button mt-5 hidden">Reiniciar avance guardado</button></div>
-		<div id="game-question" class="game-stage hidden"><div class="flex items-center justify-between gap-4"><p id="question-step" class="eyebrow"></p><span id="question-points" class="points-chip">+120 XP</span></div><h3 id="question-text" class="question-title"></h3><div id="answers" class="mt-7 grid gap-3"></div><div id="feedback" class="feedback hidden" role="status" aria-live="polite"></div><div id="hint" class="hint-box hidden" aria-live="polite"></div><div class="mt-7 flex flex-wrap justify-between gap-3"><button id="use-hint" class="button-secondary">Solicitar pista</button><button id="next-question" class="button hidden">Siguiente evidencia →</button></div></div>
-		<div id="game-result" class="game-stage hidden text-center"><div class="mission-seal success">✓</div><p class="eyebrow">Caso resuelto</p><h3>¡Red asegurada, agente!</h3><p id="result-copy"></p><div class="result-score"><strong id="final-score">0</strong><span>XP OBTENIDOS</span></div><div class="badge-award"><span>⌖</span><div><small>NUEVA INSIGNIA</small><strong>Detective IP</strong></div></div><button id="play-again" class="button mt-8">Jugar de nuevo</button></div>
-	</div></div>
+  <div class="site-container">
+    <SectionHeader eyebrow="Centro de operaciones" title="Elige una misión y entra en la red" description="Cada reto guarda tu mejor puntuación en este dispositivo. Usa las pistas cuando una evidencia te bloquee." />
+    <div class="game-layout mt-12">
+      <aside class="mission-picker" aria-label="Selector de misión">
+        <div class="mission-console"><span>CONSOLA DE MISIONES</span><p id="mission-console-message">Selecciona una operación para revisar su briefing.</p></div>
+        <div class="picker-list">{missions.map((mission, index) => <button class:list={['mission-pick', index === 0 && 'active']} data-pick-mission={mission.code}><span>{mission.icon}</span><div><small>{mission.level} · MISIÓN {mission.code}</small><strong>{mission.title}</strong></div><b>+{mission.xp}</b></button>)}</div>
+      </aside>
+      <div class="game-shell" data-missions={JSON.stringify(missions)}>
+        <div class="game-topbar"><div><span class="live-dot"></span><strong id="game-mission-label">MISIÓN 01 · LISTA</strong></div><div class="game-counters"><span>PISTAS <b id="hints-count">2</b></span><span>XP <b id="game-score">0</b></span><span>◷ <b id="timer">08:00</b></span></div></div>
+        <div class="game-progress"><i id="game-progress-bar"></i><span id="xp-spark" aria-hidden="true">✦</span></div>
+        <div id="game-start" class="game-stage text-center"><div id="mission-seal" class="mission-seal">⚡</div><p id="mission-level" class="eyebrow">Nivel inicial</p><h3 id="mission-title">Rescata la Red</h3><p id="mission-briefing"></p><button id="start-game" class="button mt-8">Iniciar misión</button></div>
+        <div id="game-question" class="game-stage hidden"><div class="flex items-center justify-between gap-4"><p id="question-step" class="eyebrow"></p><span id="question-points" class="points-chip">+100 XP</span></div><h3 id="question-text" class="question-title"></h3><div id="answers" class="mt-7 grid gap-3"></div><div id="feedback" class="feedback hidden" role="status" aria-live="polite"></div><div id="hint" class="hint-box hidden" aria-live="polite"></div><div class="mt-7 flex flex-wrap justify-between gap-3"><button id="use-hint" class="button-secondary">Solicitar pista</button><button id="next-question" class="button hidden">Siguiente prueba →</button></div></div>
+        <div id="game-result" class="game-stage hidden text-center"><div class="mission-seal success">✓</div><p class="eyebrow">Misión completada</p><h3>¡Red asegurada, agente!</h3><p id="result-copy"></p><div class="result-score"><strong id="final-score">0</strong><span>XP OBTENIDOS</span></div><div class="badge-award"><span id="award-icon">⚡</span><div><small>NUEVA INSIGNIA</small><strong id="award-name">Primer enlace</strong></div></div><div class="result-actions"><button id="play-again" class="button-secondary">Repetir</button><button id="next-mission" class="button">Siguiente misión →</button></div></div>
+        <div id="confetti" aria-hidden="true"></div>
+      </div>
+    </div>
+  </div>
 </section>
 <script>
-	type Question = { prompt: string; options: readonly string[]; answer: number; hint: string; explain: string };
-	const shell = document.querySelector<HTMLElement>('.game-shell')!;
-	const questions: Question[] = JSON.parse(shell.dataset.questions || '[]');
-	const key = 'mision-conectar-progress';
-	let current = 0, score = 0, hints = 2, seconds = 720, timerId = 0, answered = false;
-	const $ = <T extends Element>(selector: string) => document.querySelector<T>(selector)!;
-	const start = $('#game-start'), stage = $('#game-question'), result = $('#game-result');
-	const setHidden = (el: Element, hide: boolean) => el.classList.toggle('hidden', hide);
-	function loadSaved() { const saved = JSON.parse(localStorage.getItem(key) || '{}'); if (saved.completed) { $('#reset-game').classList.remove('hidden'); $('#start-game').textContent = 'Repetir misión'; } }
-	function save(completed = false) { localStorage.setItem(key, JSON.stringify({ score, completed: completed ? questions.length : current, badge: completed, updatedAt: Date.now() })); }
-	function update() { $('#game-score').textContent = String(score); $('#hints-count').textContent = String(hints); ($('#game-progress-bar') as HTMLElement).style.width = `${(current / questions.length) * 100}%`; }
-	function render() { answered = false; const q = questions[current]; $('#question-step').textContent = `EVIDENCIA ${current + 1} DE ${questions.length}`; $('#question-text').textContent = q.prompt; setHidden($('#feedback'), true); setHidden($('#hint'), true); setHidden($('#next-question'), true); setHidden($('#use-hint'), hints === 0); const answers = $('#answers'); answers.innerHTML = ''; q.options.forEach((option, index) => { const b = document.createElement('button'); b.className = 'answer-button'; b.innerHTML = `<span>${String.fromCharCode(65 + index)}</span>${option}`; b.addEventListener('click', () => answer(index)); answers.appendChild(b); }); update(); save(); }
-	function answer(index: number) { if (answered) return; answered = true; const q = questions[current]; const correct = index === q.answer; score += correct ? 120 : 25; document.querySelectorAll<HTMLButtonElement>('.answer-button').forEach((b, i) => { b.disabled = true; if (i === q.answer) b.classList.add('correct'); else if (i === index) b.classList.add('wrong'); }); const fb = $('#feedback'); fb.innerHTML = `<strong>${correct ? '✓ Evidencia validada' : '✕ Respuesta incorrecta'}</strong><p>${q.explain}</p>`; fb.classList.toggle('success', correct); setHidden(fb, false); setHidden($('#next-question'), false); update(); save(); }
-	function tick() { seconds--; const min = Math.floor(seconds / 60); const sec = String(seconds % 60).padStart(2,'0'); $('#timer').textContent = `${min}:${sec}`; if (seconds <= 0) finish(); }
-	function begin() { current = 0; score = 0; hints = 2; seconds = 720; setHidden(start, true); setHidden(result, true); setHidden(stage, false); clearInterval(timerId); timerId = window.setInterval(tick, 1000); render(); }
-	function finish() { clearInterval(timerId); score += Math.max(0, Math.floor(seconds / 10)); save(true); setHidden(stage, true); setHidden(result, false); ($('#game-progress-bar') as HTMLElement).style.width = '100%'; $('#final-score').textContent = String(score); $('#result-copy').textContent = `Completaste ${questions.length} evidencias con ${hints} pista${hints === 1 ? '' : 's'} disponible${hints === 1 ? '' : 's'}. El dispositivo intruso quedó aislado.`; document.dispatchEvent(new CustomEvent('mission-complete', { detail: { score } })); }
-	$('#start-game').addEventListener('click', begin); $('#play-again').addEventListener('click', begin);
-	$('#reset-game').addEventListener('click', () => { localStorage.removeItem(key); begin(); });
-	$('#use-hint').addEventListener('click', () => { if (!hints || answered) return; hints--; $('#hint').textContent = `PISTA: ${questions[current].hint}`; setHidden($('#hint'), false); if (!hints) setHidden($('#use-hint'), true); update(); });
-	$('#next-question').addEventListener('click', () => { current++; current >= questions.length ? finish() : render(); });
-	loadSaved(); update();
-	document.addEventListener('mission-complete', ((event: CustomEvent) => { const s = String(event.detail.score); document.querySelector('#dashboard-score')!.textContent = s; document.querySelector('#dashboard-percent')!.textContent = '100%'; (document.querySelector('#dashboard-progress') as HTMLElement).style.width = '100%'; }) as EventListener);
+  type Question = { prompt:string; options:string[]; answer:number; hint:string; explain:string };
+  type Mission = { title:string; code:string; level:string; duration:string; icon:string; xp:number; briefing:string; questions:Question[] };
+  const shell = document.querySelector<HTMLElement>('.game-shell')!;
+  const missions: Mission[] = JSON.parse(shell.dataset.missions || '[]');
+  const key = 'mision-conectar-progress-v2';
+  let missionIndex = 0, current = 0, score = 0, hints = 2, seconds = 480, timerId = 0, answered = false;
+  const $ = <T extends Element>(s:string) => document.querySelector<T>(s)!;
+  const start = $('#game-start'), stage = $('#game-question'), result = $('#game-result');
+  const hide = (el:Element, value:boolean) => el.classList.toggle('hidden', value);
+  const currentMission = () => missions[missionIndex];
+  const saved = () => { try { return JSON.parse(localStorage.getItem(key) || '{"completed":{},"totalXp":0}'); } catch { return { completed:{}, totalXp:0 }; } };
+  function selectMission(code:string) {
+    const found = missions.findIndex(m => m.code === code); if (found < 0) return; missionIndex = found;
+    clearInterval(timerId); const m = currentMission(); current = 0; score = 0; hints = 2; seconds = parseInt(m.duration) * 60;
+    $('#mission-seal').textContent = m.icon; $('#mission-level').textContent = `Nivel ${m.level}`; $('#mission-title').textContent = m.title; $('#mission-briefing').textContent = m.briefing;
+    $('#game-mission-label').textContent = `MISIÓN ${m.code} · LISTA`; $('#timer').textContent = `${String(parseInt(m.duration)).padStart(2,'0')}:00`; $('#mission-console-message').textContent = m.briefing;
+    document.querySelectorAll<HTMLElement>('[data-pick-mission]').forEach(b => b.classList.toggle('active', b.dataset.pickMission === code));
+    document.querySelectorAll<HTMLElement>('[data-mission-card]').forEach(c => c.classList.toggle('mission-featured', c.dataset.missionCard === code));
+    hide(start,false); hide(stage,true); hide(result,true); update();
+  }
+  function update() {
+    const m = currentMission(); $('#game-score').textContent = String(score); $('#hints-count').textContent = String(hints);
+    ($('#game-progress-bar') as HTMLElement).style.width = `${(current / m.questions.length) * 100}%`;
+  }
+  function render() {
+    answered = false; const m = currentMission(), q = m.questions[current]; $('#game-mission-label').textContent = `MISIÓN ${m.code} · EN CURSO`;
+    $('#question-step').textContent = `PRUEBA ${current + 1} DE ${m.questions.length}`; $('#question-points').textContent = `+${Math.round(m.xp / m.questions.length)} XP`; $('#question-text').textContent = q.prompt;
+    hide($('#feedback'),true); hide($('#hint'),true); hide($('#next-question'),true); hide($('#use-hint'),hints === 0);
+    const answers = $('#answers'); answers.innerHTML = ''; q.options.forEach((option,index) => { const b=document.createElement('button'); b.className='answer-button'; b.innerHTML=`<span>${String.fromCharCode(65+index)}</span>${option}`; b.addEventListener('click',()=>answer(index)); answers.appendChild(b); }); update();
+  }
+  function sparkle() { const spark=$('#xp-spark'); spark.classList.remove('burst'); void (spark as HTMLElement).offsetWidth; spark.classList.add('burst'); }
+  function answer(index:number) {
+    if(answered)return; answered=true; const m=currentMission(), q=m.questions[current], correct=index===q.answer, gain=correct?Math.round(m.xp/m.questions.length):25; score+=gain;
+    document.querySelectorAll<HTMLButtonElement>('.answer-button').forEach((b,i)=>{b.disabled=true;if(i===q.answer)b.classList.add('correct');else if(i===index)b.classList.add('wrong')});
+    const fb=$('#feedback'); fb.innerHTML=`<strong>${correct?'✓ Evidencia validada':'× Respuesta incorrecta'} · +${gain} XP</strong><p>${q.explain}</p>`; fb.classList.toggle('success',correct); hide(fb,false); hide($('#next-question'),false); sparkle(); update();
+  }
+  function tick(){seconds--;$('#timer').textContent=`${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;if(seconds<=0)finish()}
+  function begin(){const m=currentMission();current=0;score=0;hints=2;seconds=parseInt(m.duration)*60;hide(start,true);hide(result,true);hide(stage,false);clearInterval(timerId);timerId=window.setInterval(tick,1000);render()}
+  function celebrate(){const box=$('#confetti');box.innerHTML='';for(let i=0;i<28;i++){const s=document.createElement('i');s.style.setProperty('--x',`${Math.random()*100}%`);s.style.setProperty('--d',`${Math.random()*.8}s`);s.style.setProperty('--h',`${Math.random()*280}deg`);box.appendChild(s)}setTimeout(()=>box.innerHTML='',2600)}
+  function finish(){clearInterval(timerId);const m=currentMission();score+=Math.max(0,Math.floor(seconds/30));const data=saved();const old=Number(data.completed[m.code]||0);data.completed[m.code]=Math.max(old,score);data.totalXp=Object.values(data.completed).reduce((a,v)=>Number(a)+Number(v),0);localStorage.setItem(key,JSON.stringify(data));hide(stage,true);hide(result,false);($('#game-progress-bar') as HTMLElement).style.width='100%';$('#final-score').textContent=String(score);$('#result-copy').textContent=`Completaste ${m.title} y sumaste experiencia a tu perfil.`;$('#award-icon').textContent=m.icon;$('#award-name').textContent=m.title;$('#next-mission').classList.toggle('hidden',missionIndex===missions.length-1);celebrate();document.dispatchEvent(new CustomEvent('mission-complete',{detail:{totalXp:data.totalXp,completed:Object.keys(data.completed).length}}))}
+  document.querySelectorAll<HTMLElement>('[data-pick-mission]').forEach(b=>b.addEventListener('click',()=>selectMission(b.dataset.pickMission!)));
+  document.querySelectorAll<HTMLElement>('[data-play-mission]').forEach(b=>b.addEventListener('click',()=>selectMission(b.dataset.playMission!)));
+  document.querySelectorAll<HTMLElement>('[data-mission-card]').forEach(card=>{const open=()=>{selectMission(card.dataset.missionCard!);document.querySelector('#jugar')?.scrollIntoView({behavior:'smooth'})};card.addEventListener('click',(event)=>{if((event.target as HTMLElement).closest('a'))return;open()});card.addEventListener('keydown',(event)=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();open()}})});
+  $('#start-game').addEventListener('click',begin);$('#play-again').addEventListener('click',begin);$('#next-mission').addEventListener('click',()=>selectMission(missions[Math.min(missionIndex+1,missions.length-1)].code));
+  $('#use-hint').addEventListener('click',()=>{if(!hints||answered)return;hints--;$('#hint').textContent=`PISTA: ${currentMission().questions[current].hint}`;hide($('#hint'),false);if(!hints)hide($('#use-hint'),true);update()});
+  $('#next-question').addEventListener('click',()=>{current++;current>=currentMission().questions.length?finish():render()});
+  selectMission('01');
 </script>

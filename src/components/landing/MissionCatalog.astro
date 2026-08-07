@@ -1,10 +1,28 @@
 ---
 import SectionHeader from './SectionHeader.astro';
-import { missions } from '../../data/missions';
+import { missions, roadmap } from '../../data/missions';
 ---
-<section id="misiones" class="section">
-	<div class="site-container"><SectionHeader eyebrow="Mapa de operaciones" title="Siete misiones. Una red por salvar." description="Cada reto desarrolla una habilidad concreta. Comienza con Detective IP y prepara el camino hacia la misión final." />
-	<div class="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3">{missions.map((mission) => <article class:list={['mission-card', mission.status === 'available' && 'mission-featured', mission.status === 'locked' && 'opacity-60']}>
-		<div class="flex items-start justify-between"><span class="mission-icon">{mission.icon}</span><span class="mission-code">MISIÓN {mission.code}</span></div><h3>{mission.title}</h3><p>{mission.description}</p><div class="mt-auto flex items-center justify-between pt-6"><span class="mission-meta">{mission.level} · {mission.duration}</span>{mission.status === 'available' ? <a href="#jugar" class="card-link">Jugar ahora →</a> : <span class="text-xs font-bold text-slate-500">{mission.status === 'locked' ? 'BLOQUEADA' : 'PRÓXIMAMENTE'}</span>}</div>
-	</article>)}</div></div>
+<section id="misiones" class="section missions-zone">
+  <div class="site-container">
+    <SectionHeader eyebrow="Mapa de operaciones" title="Seis retos listos para jugar" description="Completa tres niveles iniciales y tres intermedios. Maestro y Leyenda anticipan la próxima fase interactiva." />
+    <div class="mission-filters mt-12" role="tablist" aria-label="Categorías de misiones">
+      {['Inicial','Intermedio','Maestro','Leyenda'].map((category,index)=><button class:list={['mission-filter',index===0&&'active']} role="tab" aria-selected={index===0?'true':'false'} data-filter={category.toLowerCase()}><span class:list={['category-dot',category.toLowerCase()]}></span><div><strong>{category}</strong><small>{category==='Inicial'||category==='Intermedio'?'3 niveles':'3 retos · Próximamente'}</small></div></button>)}
+    </div>
+    <div class="mission-category-panel mt-7 grid gap-5 md:grid-cols-2 lg:grid-cols-3" data-category-panel="inicial">
+      {missions.map((mission, index) => (
+        <article class:list={['mission-card', index === 0 && 'mission-featured']} data-mission-card={mission.code} data-category={mission.level.toLowerCase()} role="link" tabindex="0" aria-label={`Abrir misión ${mission.title}`} hidden={mission.level!=='Inicial'}>
+          <div class="flex items-start justify-between"><span class="mission-icon">{mission.icon}</span><span class="mission-complete-check hidden" aria-label="Misión completada">✓</span><span class="mission-code">MISIÓN {mission.code}</span></div>
+          <div class="mission-level"><span>{mission.level}</span><b>+{mission.xp} XP</b></div>
+          <h3>{mission.title}</h3><p>{mission.description}</p>
+          <div class="mt-auto flex items-center justify-between pt-6"><span class="mission-meta">{mission.duration} · 3 pruebas</span><a href="#jugar" class="card-link" data-play-mission={mission.code}>Jugar ahora →</a></div>
+        </article>
+      ))}
+    </div>
+    <div class="upcoming-levels mt-12">
+      {roadmap.map(item => <section class="upcoming-level" data-upcoming-category={item.level.toLowerCase()} aria-labelledby={`level-${item.level.toLowerCase()}`} hidden><div class="upcoming-heading"><span>{item.icon}</span><div><p>{item.status}</p><h3 id={`level-${item.level.toLowerCase()}`}>Retos {item.level}</h3><small>{item.note}</small></div><b>PRÓXIMAMENTE</b></div><div class="upcoming-challenges">{item.challenges.map((challenge,index)=><article class="upcoming-card"><div><span>{challenge.icon}</span><small>{item.level} · {String(index+1).padStart(2,'0')}</small></div><h4>{challenge.title}</h4><p>{challenge.type}</p><em>En diseño</em></article>)}</div></section>)}
+    </div>
+  </div>
 </section>
+<script>
+  const filterButtons=[...document.querySelectorAll<HTMLButtonElement>('[data-filter]')];const missionCards=[...document.querySelectorAll<HTMLElement>('[data-mission-card]')];const upcoming=[...document.querySelectorAll<HTMLElement>('[data-upcoming-category]')];function filterMissions(category:string){filterButtons.forEach(button=>{const active=button.dataset.filter===category;button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active))});missionCards.forEach(card=>card.hidden=card.dataset.category!==category);upcoming.forEach(group=>group.hidden=group.dataset.upcomingCategory!==category);document.querySelector('.mission-category-panel')?.classList.toggle('hidden',category==='maestro'||category==='leyenda')};filterButtons.forEach(button=>button.addEventListener('click',()=>filterMissions(button.dataset.filter!)));function paintMissionChecks(){const data=JSON.parse(localStorage.getItem('mision-conectar-progress-v2')||'{"completed":{}}');missionCards.forEach(card=>card.querySelector('.mission-complete-check')?.classList.toggle('hidden',!data.completed?.[card.dataset.missionCard!]))}paintMissionChecks();document.addEventListener('mission-complete',paintMissionChecks);document.addEventListener('progress-reset',paintMissionChecks);filterMissions('inicial');
+</script>

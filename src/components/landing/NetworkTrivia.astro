@@ -1,0 +1,57 @@
+---
+import SectionHeader from './SectionHeader.astro';
+const pairs = [
+  { id:'dns', concept:'DNS', meaning:'Traduce nombres de dominio a direcciones IP' },
+  { id:'dhcp', concept:'DHCP', meaning:'Asigna configuración IP automáticamente' },
+  { id:'router', concept:'Router', meaning:'Reenvía paquetes entre redes diferentes' },
+  { id:'switch', concept:'Switch', meaning:'Conecta dispositivos dentro de una LAN' },
+  { id:'vlan', concept:'VLAN', meaning:'Segmenta lógicamente una red conmutada' },
+  { id:'firewall', concept:'Firewall', meaning:'Filtra tráfico según reglas de seguridad' },
+  { id:'ip', concept:'Dirección IP', meaning:'Identifica lógicamente una interfaz en la red' },
+  { id:'mac', concept:'Dirección MAC', meaning:'Identificador de enlace asociado a una interfaz' },
+  { id:'gateway', concept:'Gateway', meaning:'Puerta de salida hacia otras redes' },
+  { id:'subnet', concept:'Máscara de subred', meaning:'Separa la parte de red y host de una IP' },
+  { id:'nat', concept:'NAT', meaning:'Traduce direcciones entre redes privadas y públicas' },
+  { id:'tcp', concept:'TCP', meaning:'Transporte orientado a conexión y entrega confiable' },
+  { id:'udp', concept:'UDP', meaning:'Transporte rápido sin confirmación de entrega' },
+  { id:'icmp', concept:'ICMP', meaning:'Comunica diagnósticos y errores de red' },
+  { id:'arp', concept:'ARP', meaning:'Relaciona una dirección IPv4 con una dirección MAC' },
+  { id:'https', concept:'HTTPS', meaning:'Protege tráfico web mediante cifrado TLS' },
+  { id:'ssh', concept:'SSH', meaning:'Permite administración remota cifrada' },
+  { id:'ftp', concept:'FTP', meaning:'Transfiere archivos entre cliente y servidor' },
+  { id:'lan', concept:'LAN', meaning:'Red que cubre un área local limitada' },
+  { id:'wan', concept:'WAN', meaning:'Interconecta redes a grandes distancias' },
+  { id:'ssid', concept:'SSID', meaning:'Nombre que identifica una red Wi‑Fi' },
+  { id:'vpn', concept:'VPN', meaning:'Crea un túnel cifrado sobre otra red' },
+  { id:'vlan-trunk', concept:'Trunk', meaning:'Transporta tráfico de varias VLAN' },
+  { id:'access-port', concept:'Puerto access', meaning:'Conecta un dispositivo a una sola VLAN' },
+  { id:'poe', concept:'PoE', meaning:'Entrega energía y datos por Ethernet' },
+  { id:'fiber', concept:'Fibra óptica', meaning:'Transmite datos usando pulsos de luz' },
+  { id:'utp', concept:'Cable UTP', meaning:'Medio de cobre formado por pares trenzados' },
+  { id:'broadcast', concept:'Broadcast', meaning:'Envío dirigido a todos los hosts de una subred' },
+  { id:'unicast', concept:'Unicast', meaning:'Comunicación de un origen a un destino' },
+  { id:'latency', concept:'Latencia', meaning:'Tiempo que tarda un dato en recorrer la red' },
+];
+---
+<section id="trivia" class="section trivia-section"><div class="site-container">
+  <SectionHeader eyebrow="Sprint mental" title="Empareja conceptos antes de que termine el tiempo" description="Selecciona un concepto y su significado. Los aciertos encadenados aumentan la racha y la puntuación." />
+  <div class="trivia-shell mt-12" data-pairs={JSON.stringify(pairs)}>
+    <div class="trivia-top"><div><span class="live-dot"></span><strong>TRIVIA DE REDES</strong></div><div class="trivia-metrics"><span>RACHA <b id="trivia-streak">×0</b></span><span>PUNTOS <b id="trivia-score">0</b></span><span>TIEMPO <b id="trivia-timer">70</b></span></div></div>
+    <div class="trivia-time"><i id="trivia-timebar"></i></div>
+    <div id="trivia-intro" class="trivia-intro"><div class="trivia-orb">↔</div><h3>Siete pares. Setenta segundos.</h3><p>Cada intento selecciona 7 conceptos aleatorios de una biblioteca de 30. Un error rompe la racha, pero puedes continuar.</p><button id="trivia-start" class="button">Comenzar trivia</button></div>
+    <div id="trivia-game" class="trivia-game hidden"><div><p class="trivia-column-title">CONCEPTOS</p><div id="concept-column" class="trivia-column"></div></div><div><p class="trivia-column-title">SIGNIFICADOS</p><div id="meaning-column" class="trivia-column"></div></div></div>
+    <div id="trivia-feedback" class="trivia-feedback" aria-live="polite">Selecciona un elemento de cada columna.</div>
+    <div id="trivia-result" class="trivia-result hidden"><span id="trivia-result-icon">✓</span><div><small>RONDA TERMINADA</small><h3 id="trivia-result-title">¡Todos los pares conectados!</h3><p id="trivia-result-copy"></p></div><button id="trivia-restart" class="button">Jugar otra vez</button></div>
+  </div>
+</div></section>
+<script>
+  type Pair={id:string;concept:string;meaning:string};const trivia=document.querySelector<HTMLElement>('.trivia-shell')!;const pairs:Pair[]=JSON.parse(trivia.dataset.pairs||'[]');let roundPairs:Pair[]=[],selectedConcept:HTMLButtonElement|null=null,selectedMeaning:HTMLButtonElement|null=null,matched=0,score=0,streak=0,time=70,triviaTimer=0,running=false;
+  const shuffle=<T,>(items:T[])=>[...items].sort(()=>Math.random()-.5);const q=<T extends Element>(s:string)=>document.querySelector<T>(s)!;const toggle=(el:Element,hidden:boolean)=>el.classList.toggle('hidden',hidden);
+  function renderTrivia(){roundPairs=shuffle(pairs).slice(0,7);const concepts=q('#concept-column'),meanings=q('#meaning-column');concepts.innerHTML='';meanings.innerHTML='';shuffle(roundPairs).forEach(pair=>{const b=document.createElement('button');b.textContent=pair.concept;b.dataset.pair=pair.id;b.addEventListener('click',()=>choose(b,'concept'));concepts.appendChild(b)});shuffle(roundPairs).forEach(pair=>{const b=document.createElement('button');b.textContent=pair.meaning;b.dataset.pair=pair.id;b.addEventListener('click',()=>choose(b,'meaning'));meanings.appendChild(b)})}
+  function choose(button:HTMLButtonElement,side:'concept'|'meaning'){if(!running||button.classList.contains('matched'))return;const previous=side==='concept'?selectedConcept:selectedMeaning;previous?.classList.remove('selected');button.classList.add('selected');if(side==='concept')selectedConcept=button;else selectedMeaning=button;if(selectedConcept&&selectedMeaning)checkPair()}
+  function checkPair(){if(!selectedConcept||!selectedMeaning)return;const correct=selectedConcept.dataset.pair===selectedMeaning.dataset.pair;if(correct){streak++;matched++;score+=100+(streak-1)*20;selectedConcept.classList.add('matched');selectedMeaning.classList.add('matched');q('#trivia-feedback').textContent=`✓ Par conectado · +${100+(streak-1)*20} puntos`;if(matched===roundPairs.length)finishTrivia(true)}else{streak=0;score=Math.max(0,score-20);selectedConcept.classList.add('wrong');selectedMeaning.classList.add('wrong');q('#trivia-feedback').textContent='Ese enlace no corresponde. Intenta otra combinación.';const a=selectedConcept,b=selectedMeaning;setTimeout(()=>{a.classList.remove('wrong','selected');b.classList.remove('wrong','selected')},450)}selectedConcept=null;selectedMeaning=null;paintTrivia()}
+  function paintTrivia(){q('#trivia-streak').textContent=`×${streak}`;q('#trivia-score').textContent=String(score);q('#trivia-timer').textContent=String(time);(q('#trivia-timebar') as HTMLElement).style.width=`${(time/70)*100}%`;q('#trivia-timebar').classList.toggle('urgent',time<=15)}
+  function startTrivia(){clearInterval(triviaTimer);matched=0;score=0;streak=0;time=70;running=true;selectedConcept=null;selectedMeaning=null;renderTrivia();toggle(q('#trivia-intro'),true);toggle(q('#trivia-result'),true);toggle(q('#trivia-game'),false);q('#trivia-feedback').textContent='Selecciona un elemento de cada columna.';paintTrivia();triviaTimer=window.setInterval(()=>{time--;paintTrivia();if(time<=0)finishTrivia(false)},1000)}
+  function finishTrivia(completed:boolean){if(!running)return;running=false;clearInterval(triviaTimer);toggle(q('#trivia-game'),true);toggle(q('#trivia-result'),false);q('#trivia-result-icon').textContent=completed?'✓':'◷';q('#trivia-result-title').textContent=completed?'¡Todos los pares conectados!':'Se acabó el tiempo';q('#trivia-result-copy').textContent=`Conectaste ${matched} de ${roundPairs.length} pares y conseguiste ${score} puntos.`}
+  q('#trivia-start').addEventListener('click',startTrivia);q('#trivia-restart').addEventListener('click',startTrivia);paintTrivia();
+</script>

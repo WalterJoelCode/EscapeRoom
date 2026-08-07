@@ -1,19 +1,27 @@
 ---
 import SectionHeader from './SectionHeader.astro';
-const leaders = [['01','Luna_Router','4,820'],['02','NetMaster','4,560'],['03','ByteNinja','4,210'],['04','Tú','0']];
-const badges = [['⌖','Detective IP','Completa la misión 02'],['⚡','Respuesta rápida','Responde en menos de 30 s'],['◎','Sin errores','Logra una misión perfecta'],['◆','Arquitecto de red','Supera la misión final']];
+const badges = [['⚡','Primer enlace','Completa tu primera misión'],['⌖','Detective IP','Supera Detective IP'],['◎','Triple inicial','Completa la categoría Inicial'],['◆','Operador intermedio','Completa las seis misiones']];
 ---
 <section id="progreso" class="section light-section">
 	<div class="site-container"><SectionHeader eyebrow="Panel del agente" title="Tu progreso cuenta una historia" description="Cada respuesta correcta suma experiencia. Tus logros se conservan en este navegador, sin cuentas ni datos personales." />
 	<div class="mt-14 grid gap-6 lg:grid-cols-[1.25fr_.75fr]">
-		<article class="dashboard-card"><div class="flex flex-wrap items-center justify-between gap-4"><div><p class="eyebrow">Nivel actual</p><h3 class="mt-2 text-2xl">Agente en entrenamiento</h3></div><div class="level-orb"><strong id="dashboard-score">0</strong><span>XP</span></div></div><div class="mt-8"><div class="mb-2 flex justify-between text-xs"><span>Progreso total</span><span id="dashboard-percent">0%</span></div><div class="progress-track"><i id="dashboard-progress" style="width:0%"></i></div></div><div class="mt-8 grid gap-3 sm:grid-cols-2">{badges.map((badge, i) => <div class:list={['badge-item', i > 0 && 'is-locked']}><span>{badge[0]}</span><div><strong>{badge[1]}</strong><small>{badge[2]}</small></div></div>)}</div></article>
-		<article class="dashboard-card"><div class="flex items-center justify-between"><div><p class="eyebrow">Clasificación</p><h3 class="mt-2 text-2xl">Ranking semanal</h3></div><span class="text-2xl">🏆</span></div><ol class="mt-6 space-y-2">{leaders.map(row => <li class:list={['rank-row', row[1] === 'Tú' && 'you']}><span>{row[0]}</span><strong>{row[1]}</strong><b>{row[2]} XP</b></li>)}</ol></article>
+		<article class="dashboard-card"><div class="flex flex-wrap items-center justify-between gap-4"><div><p class="eyebrow">Nivel actual</p><h3 id="agent-rank" class="mt-2 text-2xl">Agente en entrenamiento</h3></div><div class="level-orb"><strong id="dashboard-score">0</strong><span>XP</span></div></div><div class="mt-8"><div class="mb-2 flex justify-between text-xs"><span>Misiones completadas</span><span id="dashboard-percent">0%</span></div><div class="progress-track"><i id="dashboard-progress" style="width:0%"></i><span class="progress-glint">✦</span></div></div><div id="badge-grid" class="mt-8 grid gap-3 sm:grid-cols-2">{badges.map((badge) => <div class="badge-item is-locked"><span>{badge[0]}</span><div><strong>{badge[1]}</strong><small>{badge[2]}</small></div></div>)}</div></article>
+		<article class="dashboard-card"><div class="flex items-center justify-between"><div><p class="eyebrow">Clasificación simulada</p><h3 class="mt-2 text-2xl">Ranking semanal</h3></div><span class="text-2xl">🏆</span></div><ol id="ranking-list" class="mt-6 space-y-2"></ol><p class="ranking-note">Los rivales y sus XP cambian en cada sesión. Tu posición refleja tu XP real.</p><button id="open-reset-progress" class="reset-progress-button"><span aria-hidden="true">↺</span> Reiniciar mi progreso</button></article>
 	</div></div>
 </section>
+<dialog id="reset-progress-dialog" class="reset-progress-dialog" aria-labelledby="reset-dialog-title"><div class="reset-dialog-icon">!</div><h2 id="reset-dialog-title">¿Reiniciar todo el progreso?</h2><p>Se eliminarán tus XP, misiones completadas, rango e insignias. Esta acción no se puede deshacer.</p><div><button id="cancel-reset-progress" class="button-secondary">Conservar progreso</button><button id="confirm-reset-progress" class="danger-button">Sí, borrar todo</button></div></dialog>
 <script>
-	const saved = JSON.parse(localStorage.getItem('mision-conectar-progress') || '{}');
-	const score = Number(saved.score || 0); const percent = Math.min(100, Number(saved.completed || 0) * 20);
-	document.querySelector('#dashboard-score')!.textContent = String(score);
-	document.querySelector('#dashboard-percent')!.textContent = `${percent}%`;
-	(document.querySelector('#dashboard-progress') as HTMLElement).style.width = `${percent}%`;
+	function paintProgress(payload?: { totalXp:number; completed:number }) {
+		const data = JSON.parse(localStorage.getItem('mision-conectar-progress-v2') || '{"completed":{},"totalXp":0}');
+		const score = payload?.totalXp ?? Number(data.totalXp || 0); const completed = payload?.completed ?? Object.keys(data.completed || {}).length; const percent = Math.round((completed / 6) * 100);
+		document.querySelector('#dashboard-score')!.textContent = String(score); document.querySelector('#dashboard-percent')!.textContent = `${percent}%`; (document.querySelector('#dashboard-progress') as HTMLElement).style.width = `${percent}%`;
+		document.querySelector('#agent-rank')!.textContent = completed >= 6 ? 'Operador de red' : completed >= 3 ? 'Analista intermedio' : completed ? 'Agente conectado' : 'Agente en entrenamiento';
+		document.querySelectorAll('#badge-grid .badge-item').forEach((badge,index) => badge.classList.toggle('is-locked', index === 0 ? completed < 1 : index === 1 ? !data.completed?.['02'] : index === 2 ? completed < 3 : completed < 6));
+		paintRanking(score);
+	}
+	function getRivals(){const pool=['Luna_Router','ByteNinja','PacketFox','VLAN_Vega','PingWizard','CyberLynx'];const stored=sessionStorage.getItem('mc-rivals');if(stored)return JSON.parse(stored);const names=[...pool].sort(()=>Math.random()-.5).slice(0,3);const rivals=names.map((name,i)=>({name,xp:Math.floor(700+Math.random()*3600)+(i*120)}));sessionStorage.setItem('mc-rivals',JSON.stringify(rivals));return rivals}
+	function paintRanking(score:number){const rows=[...getRivals(),{name:'Tú',xp:score,you:true}].sort((a,b)=>b.xp-a.xp);document.querySelector('#ranking-list')!.innerHTML=rows.map((row,index)=>`<li class="rank-row ${row.you?'you':''}"><span>${String(index+1).padStart(2,'0')}</span><strong>${row.name}</strong><b>${Number(row.xp).toLocaleString('es')} XP</b></li>`).join('')}
+	paintProgress();
+	document.addEventListener('mission-complete', ((event:CustomEvent) => paintProgress(event.detail)) as EventListener);
+	const resetDialog=document.querySelector<HTMLDialogElement>('#reset-progress-dialog')!;document.querySelector('#open-reset-progress')?.addEventListener('click',()=>resetDialog.showModal());document.querySelector('#cancel-reset-progress')?.addEventListener('click',()=>resetDialog.close());resetDialog.addEventListener('click',event=>{if(event.target===resetDialog)resetDialog.close()});document.querySelector('#confirm-reset-progress')?.addEventListener('click',()=>{localStorage.removeItem('mision-conectar-progress-v2');resetDialog.close();paintProgress();document.dispatchEvent(new CustomEvent('progress-reset'))});
 </script>

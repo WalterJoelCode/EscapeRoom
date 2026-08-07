@@ -3,6 +3,7 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Seo from '../components/Seo.astro';
+import ProgressModal from '../components/ProgressModal.astro';
 
 interface Props { title?: string; description?: string; image?: string; noindex?: boolean; }
 const seo = Astro.props;
@@ -14,7 +15,8 @@ const base = import.meta.env.BASE_URL;
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="generator" content={Astro.generator} />
-		<meta name="theme-color" content="#071426" />
+		<meta name="theme-color" content="#071426" media="(prefers-color-scheme: dark)" />
+		<meta name="theme-color" content="#edf7fb" media="(prefers-color-scheme: light)" />
 		<link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
 		<link rel="sitemap" href={`${base}sitemap-index.xml`} />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -30,5 +32,6 @@ const base = import.meta.env.BASE_URL;
 		<Header />
 		<main id="contenido"><slot /></main>
 		<Footer />
+		<ProgressModal />
 	</body>
 </html>
