@@ -3,12 +3,12 @@ import SectionHeader from './SectionHeader.astro';
 const faqs = [
 	['¿Necesito conocimientos previos de redes?','No. Las primeras misiones introducen los conceptos mediante pistas y retroalimentación. Los retos avanzan de forma gradual.'],
 	['¿Dónde se guarda mi progreso?','Exclusivamente en localStorage, dentro de tu navegador. El demo no tiene autenticación, base de datos ni envía información a servidores.'],
-	['¿Puedo repetir una misión?','Sí. Puedes repetir Detective IP tantas veces como quieras para mejorar tu puntuación y afianzar los conceptos.'],
-	['¿Las siete misiones están disponibles?','Detective IP es la misión funcional de este demo. Las demás muestran la ruta educativa y están preparadas como contenido demostrativo.'],
+	['¿Puedo repetir una misión?','Sí. Las seis misiones jugables pueden repetirse tantas veces como quieras. Se conserva tu mejor puntuación.'],
+	['¿Qué misiones están disponibles?','Hay tres misiones Iniciales y tres Intermedias. Maestro y Leyenda muestran los retos planificados como Próximamente.'],
 	['¿Funciona en celular y tableta?','Sí. La interfaz, controles y textos se adaptan a pantallas pequeñas y también pueden utilizarse con teclado.'],
 ];
 ---
 <section id="faq" class="section"><div class="site-container max-w-4xl"><SectionHeader eyebrow="Canal de soporte" title="Preguntas frecuentes" />
 	<div class="mt-12 divide-y divide-white/10">{faqs.map((faq, i) => <details class="faq-item" open={i === 0}><summary>{faq[0]}<span aria-hidden="true">+</span></summary><p>{faq[1]}</p></details>)}</div>
-	<div class="final-cta"><div><p class="eyebrow">La red te necesita</p><h2>¿Listo para pensar como un especialista?</h2></div><a href="#jugar" class="button">Comenzar misión →</a></div>
+	<div class="final-cta"><div><p class="eyebrow">La red te necesita</p><h2>¿Listo para pensar como un especialista?</h2></div><a href={`${import.meta.env.BASE_URL}#jugar`} class="button">Comenzar misión →</a></div>
 </div></section>

@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHeader from '../components/landing/SectionHeader.astro';
+const resources = [
+  { type:'CURSO', title:'Fundamentos de redes', copy:'TCP/IP, DNS, topologías, protocolos y dispositivos.', source:'Microsoft Learn', url:'https://learn.microsoft.com/en-us/training/modules/network-fundamentals/', level:'Inicial' },
+  { type:'GUÍA', title:'Modelo OSI y redes', copy:'Recorrido audiovisual por las siete capas del modelo OSI.', source:'Microsoft Learn', url:'https://learn.microsoft.com/en-us/shows/networking-fundamentals/02', level:'Inicial' },
+  { type:'RUTA', title:'Cómo funciona DNS', copy:'Explicación visual del recorrido de una consulta DNS.', source:'Cloudflare Learning Center', url:'https://developers.cloudflare.com/learning-paths/cybersafe/concepts/what-is-dns/', level:'Inicial' },
+  { type:'ACADEMIA', title:'Cisco Networking Academy', copy:'Cursos gratuitos de redes, ciberseguridad y habilidades digitales.', source:'Cisco', url:'https://www.netacad.com/', level:'Todos' },
+  { type:'SIMULADOR', title:'Cisco Packet Tracer', copy:'Construye, configura y prueba redes completas en un entorno virtual.', source:'Cisco', url:'https://www.netacad.com/learning-collections/cisco-packet-tracer', level:'Práctica' },
+];
+---
+<BaseLayout title="Recursos de redes" description="Cinco recursos educativos seleccionados para practicar redes, DNS, modelo OSI y Packet Tracer.">
+  <section class="page-hero"><div class="site-container"><p class="eyebrow">Biblioteca de campo</p><h1>Cinco recursos para seguir conectando ideas.</h1><p>Selección externa, gratuita y mantenida por organizaciones reconocidas.</p></div></section>
+  <section class="section"><div class="site-container"><SectionHeader eyebrow="Aprendizaje externo" title="Guías, cursos y simuladores" description="Abre cada recurso en una pestaña nueva y vuelve cuando quieras a continuar tus misiones." />
+    <div class="resource-library mt-12">{resources.map((resource,index)=><a class="resource-card" href={resource.url} target="_blank" rel="noopener noreferrer"><div><span>{resource.type}</span><b>{String(index+1).padStart(2,'0')}</b></div><h2>{resource.title}</h2><p>{resource.copy}</p><footer><small>{resource.source} · {resource.level}</small><strong>Explorar ↗</strong></footer></a>)}</div>
+  </div></section>
+</BaseLayout>
