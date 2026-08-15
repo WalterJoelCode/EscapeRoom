@@ -2,7 +2,7 @@ export const site = {
   name: 'Misión Conectar',
   title: 'Misión Conectar: Escape Room Tecnológico',
   titleTemplate: '%s | Misión Conectar',
-  description: 'Escape room educativo para aprender infraestructura de redes resolviendo misiones, laboratorios y retos tecnológicos.',
+  description: 'Escape room educativo para investigar un ciberataque y aprender infraestructura de redes mediante misiones, comandos y evidencia progresiva.',
   url: 'https://walterjoelcode.github.io/EscapeRoom',
   locale: 'es_NI',
   author: 'Walter Joel',
