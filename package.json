@@ -1,7 +1,7 @@
 {
   "name": "escape-room",
   "type": "module",
-  "version": "2.1.0",
+  "version": "2.6.0",
   "description": "Escape room educativo para aprender infraestructura de redes mediante retos",
   "license": "MIT",
   "author": "kpab (https://github.com/kpab)",
@@ -43,6 +43,7 @@
     "@astrojs/sitemap": "^3.7.3",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.1.6",
+    "jspdf": "^3.0.3",
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {

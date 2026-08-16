@@ -3,7 +3,7 @@ interface Props { size?: 'sm' | 'md'; }
 const { size = 'md' } = Astro.props;
 const base = import.meta.env.BASE_URL;
 ---
-<a href={base} class="flex items-center gap-3" aria-label="Misión Conectar, inicio">
-	<span class:list={["grid place-items-center rounded-xl bg-cyan text-navy-deep font-black shadow-glow", size === 'sm' ? 'h-9 w-9 text-sm' : 'h-11 w-11']}>MC</span>
-	<span class:list={["brand-name font-display font-bold leading-none text-white", size === 'sm' ? 'text-sm' : 'text-base']}>Misión<br/><span class="text-cyan">Conectar</span></span>
+<a href={`${base}#inicio`} class="app-logo" aria-label="Misión Conectar, volver al inicio">
+	<img src={`${base}logo-mark.svg`} width="48" height="48" alt="" class:list={["logo-mark", size === 'sm' ? 'logo-mark-sm' : '']} />
+	<span class:list={["brand-name font-display font-bold leading-none", size === 'sm' ? 'text-sm' : 'text-base']}>Misión<br/><span>Conectar</span></span>
 </a>

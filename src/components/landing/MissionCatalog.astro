@@ -5,7 +5,7 @@ const categories = ['Inicial','Intermedio','Maestro','Leyenda'];
 ---
 <section id="misiones" class="section missions-zone">
   <div class="site-container">
-    <SectionHeader eyebrow="Mapa de operaciones" title="Nueve operaciones para recuperar la red" description="Avanza desde diagnóstico y direccionamiento hasta contención, análisis forense y alta disponibilidad." />
+    <SectionHeader eyebrow="Mapa de operaciones · Caso NEXO-0213" title="Nueve operaciones para reconstruir el ataque" description="Cada misión recupera una evidencia: desde la IP comprometida y la ruta de entrada hasta la contención, el análisis forense y la identidad del intruso." />
     <div class="mission-filters mt-12" role="tablist" aria-label="Categorías de misiones">
       {categories.map((category,index)=><button class:list={['mission-filter',index===0&&'active']} role="tab" aria-selected={index===0?'true':'false'} data-filter={category.toLowerCase()}><span class:list={['category-dot',category.toLowerCase()]}></span><div><strong>{category}</strong><small>{category==='Leyenda'?'3 retos · Próximamente':'3 misiones jugables'}</small></div></button>)}
     </div>
