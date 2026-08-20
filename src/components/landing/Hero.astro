@@ -1,3 +1,6 @@
+---
+const base = import.meta.env.BASE_URL;
+---
 <section id="inicio" class="hero-grid relative overflow-hidden">
 	<div class="grid-glow absolute inset-0" aria-hidden="true"></div>
 	<div class="site-container relative grid min-h-[720px] items-center gap-12 py-20 lg:grid-cols-[1.08fr_.92fr]">
@@ -6,7 +9,7 @@
 			<p class="eyebrow mt-8">Aprendizaje basado en retos</p>
 			<h1 class="mt-4 text-5xl font-bold leading-[1.04] text-white sm:text-6xl lg:text-7xl">La red fue vulnerada.<br/><span class="text-gradient">Tu misión es reconstruir el ataque.</span></h1>
 			<p class="mt-7 max-w-2xl text-lg leading-8 text-slate-300">Una credencial filtrada abrió la puerta. Investiga la IP comprometida, sigue el movimiento lateral y recupera cada sector mientras descubres quién está detrás del caso NEXO-0213.</p>
-			<div class="mt-9 flex flex-wrap gap-4"><a class="button" href="#jugar">Comenzar misión <span aria-hidden="true">→</span></a><a class="button-secondary" href="#misiones">Explorar misiones</a></div>
+			<div class="mt-9 flex flex-wrap gap-4"><a class="button" href={`${base}misiones/#jugar`}>Comenzar misión <span aria-hidden="true">→</span></a><a class="button-secondary" href="#misiones">Explorar misiones</a></div>
 			<div class="mt-10 flex flex-wrap gap-6 text-sm text-slate-400"><span>✓ Sin registro</span><span>✓ Avance local</span><span>✓ Aprende a tu ritmo</span></div>
 		</div>
 		<div class="relative mx-auto w-full max-w-[520px] animate-in delay-1" aria-label="Panel de estado de red">
